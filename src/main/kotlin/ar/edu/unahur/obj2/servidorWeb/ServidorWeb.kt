@@ -7,8 +7,20 @@ import java.time.LocalDateTime
 enum class CodigoHttp(val codigo: Int) {
   OK(200),
   NOT_IMPLEMENTED(501),
-  NOT_FOUND(404),
+  NOT_FOUND(404)
 }
 
-class Pedido(val ip: String, val url: String, val fechaHora: LocalDateTime)
+class Pedido(val ip: String, val url: String, val fechaHora: LocalDateTime){
+  fun protocolo() = url.split(":").first()
+  fun ruta() = "/" + url.split("://").last().substringAfter("/")
+  fun extension() = url.split(".").last()
+
+  fun esHttp() = this.protocolo() == "http"
+}
 class Respuesta(val codigo: CodigoHttp, val body: String, val tiempo: Int, val pedido: Pedido)
+
+class ServidorWeb{
+
+  fun atenderPedido(pedido: Pedido) = if (pedido.esHttp()) Respuesta(CodigoHttp.OK, "OK", 5, pedido) else
+    Respuesta(CodigoHttp.NOT_IMPLEMENTED, "", 10, pedido)
+}
