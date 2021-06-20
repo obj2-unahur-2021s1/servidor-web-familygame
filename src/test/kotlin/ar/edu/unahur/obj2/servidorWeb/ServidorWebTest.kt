@@ -10,7 +10,7 @@ class ServidorWebTest : DescribeSpec({
     it("de un protocolo soportado"){
       val pedido = Pedido("231.124.70.25", "http://pepito.com.ar/documentos/doc1.html", LocalDateTime.now())
       val respuesta = servidor1.atenderPedido(pedido)
-      respuesta.codigo.shouldBe(CodigoHttp.OK)
+      respuesta.codigo.shouldBe(CodigoHttp.NOT_FOUND)
     }
     it("de un protocolo no soportado"){
       val pedido = Pedido("231.124.70.25", "https://pepito.com.ar/documentos/doc1.html", LocalDateTime.now())

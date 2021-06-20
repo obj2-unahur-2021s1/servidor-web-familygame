@@ -20,7 +20,22 @@ class Pedido(val ip: String, val url: String, val fechaHora: LocalDateTime){
 class Respuesta(val codigo: CodigoHttp, val body: String, val tiempo: Int, val pedido: Pedido)
 
 class ServidorWeb{
+  private val modulos = mutableListOf<Modulo>()
 
-  fun atenderPedido(pedido: Pedido) = if (pedido.esHttp()) Respuesta(CodigoHttp.OK, "OK", 5, pedido) else
-    Respuesta(CodigoHttp.NOT_IMPLEMENTED, "", 10, pedido)
+  fun atenderPedido(pedido: Pedido) : Respuesta {
+    return if(pedido.esHttp() && this.algunMetodoSoporta(pedido.url)){
+      val moduloElegido = this.modulos.find { it.puedeTrabajarCon(pedido.url) }!!
+      Respuesta(CodigoHttp.OK, moduloElegido.body, moduloElegido.tiempoRespuesta, pedido)
+    }else if (pedido.esHttp() && !this.algunMetodoSoporta(pedido.url)){
+      Respuesta(CodigoHttp.NOT_FOUND, "", 10, pedido)
+    }else{
+      Respuesta(CodigoHttp.NOT_IMPLEMENTED, "", 10, pedido)
+    }
+  }
+
+  private fun algunMetodoSoporta(url: String) = this.modulos.any { it.puedeTrabajarCon(url) }
+
+  fun agregarModulo(modulo: Modulo) {
+    this.modulos.add(modulo)
+  }
 }
