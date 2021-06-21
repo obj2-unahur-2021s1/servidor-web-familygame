@@ -23,17 +23,17 @@ class ServidorWeb{
   private val modulos = mutableListOf<Modulo>()
 
   fun atenderPedido(pedido: Pedido) : Respuesta {
-    return if(pedido.esHttp() && this.algunMetodoSoporta(pedido.url)){
+    return if(pedido.esHttp() && this.algunModuloSoporta(pedido.url)){
       val moduloElegido = this.modulos.find { it.puedeTrabajarCon(pedido.url) }!!
       Respuesta(CodigoHttp.OK, moduloElegido.body, moduloElegido.tiempoRespuesta, pedido)
-    }else if (pedido.esHttp() && !this.algunMetodoSoporta(pedido.url)){
+    }else if (pedido.esHttp() && !this.algunModuloSoporta(pedido.url)){
       Respuesta(CodigoHttp.NOT_FOUND, "", 10, pedido)
     }else{
       Respuesta(CodigoHttp.NOT_IMPLEMENTED, "", 10, pedido)
     }
   }
 
-  private fun algunMetodoSoporta(url: String) = this.modulos.any { it.puedeTrabajarCon(url) }
+  private fun algunModuloSoporta(url: String) = this.modulos.any { it.puedeTrabajarCon(url) }
 
   fun agregarModulo(modulo: Modulo) {
     this.modulos.add(modulo)
