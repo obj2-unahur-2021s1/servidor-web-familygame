@@ -1,6 +1,7 @@
 package ar.edu.unahur.obj2.servidorWeb
 
 import io.kotest.core.spec.style.DescribeSpec
+import io.kotest.matchers.booleans.shouldBeTrue
 import io.kotest.matchers.shouldBe
 import java.time.LocalDateTime
 
@@ -30,5 +31,11 @@ class ServidorWebTest : DescribeSpec({
     it("Su extension es html"){
       pedido.extension().shouldBe("html")
     }
+  }
+
+  describe("Modulos"){
+    val extensionesSoportadas = mutableListOf<String>("jpeg", "gif", "png")
+    val moduloImagen = Modulo(extensionesSoportadas, "", 25)
+    moduloImagen.puedeTrabajarCon("http://pepito.com.ar/imagen/imagen1.jpeg").shouldBeTrue()
   }
 })

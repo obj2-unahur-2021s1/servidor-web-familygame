@@ -22,14 +22,22 @@ class Respuesta(val codigo: CodigoHttp, val body: String, val tiempo: Int, val p
 class ServidorWeb{
   private val modulos = mutableListOf<Modulo>()
 
+  private val analizadores = mutableListOf<Analizador>()
+
   fun atenderPedido(pedido: Pedido) : Respuesta {
     return if(pedido.esHttp() && this.algunModuloSoporta(pedido.url)){
       val moduloElegido = this.modulos.find { it.puedeTrabajarCon(pedido.url) }!!
-      Respuesta(CodigoHttp.OK, moduloElegido.body, moduloElegido.tiempoRespuesta, pedido)
+      val respuesta = Respuesta(CodigoHttp.OK, moduloElegido.body, moduloElegido.tiempoRespuesta, pedido)
+      this.analizadores.forEach{ it.analizarRespuesta(respuesta, moduloElegido) }
+      respuesta
     }else if (pedido.esHttp() && !this.algunModuloSoporta(pedido.url)){
-      Respuesta(CodigoHttp.NOT_FOUND, "", 10, pedido)
+      var respuesta = Respuesta(CodigoHttp.NOT_FOUND, "", 10, pedido)
+      this.analizadores.forEach{ it.analizarRespuesta(respuesta, null) }
+      return respuesta
     }else{
-      Respuesta(CodigoHttp.NOT_IMPLEMENTED, "", 10, pedido)
+      var respuesta = Respuesta(CodigoHttp.NOT_IMPLEMENTED, "", 10, pedido)
+      this.analizadores.forEach{ it.analizarRespuesta(respuesta, null) }
+      return respuesta
     }
   }
 
@@ -37,5 +45,17 @@ class ServidorWeb{
 
   fun agregarModulo(modulo: Modulo) {
     this.modulos.add(modulo)
+  }
+
+  fun quitarModulo(modulo: Modulo) {
+    this.modulos.remove(modulo)
+  }
+
+  fun agregarAnalizador(analizador : Analizador){
+    this.analizadores.add(analizador)
+  }
+
+  fun quitarAnalizador(analizador : Analizador){
+    this.analizadores.remove(analizador)
   }
 }
